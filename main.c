@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under BSD 3-Clause license,
@@ -24,6 +24,12 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "lcdtp.h"
+#include "xpt2046.h"
+#include <time.h>
+#include "image.h"
+#include "interface.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -33,6 +39,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+//Own variables
+char charData[80];
+int16_t pointX;
+int16_t pointY;
 
 /* USER CODE END PD */
 
@@ -46,7 +56,6 @@ TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim4;
 
 UART_HandleTypeDef huart4;
-
 SRAM_HandleTypeDef hsram1;
 
 /* USER CODE BEGIN PV */
@@ -58,7 +67,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_FSMC_Init(void);
 static void MX_TIM2_Init(void);
-static void MX_TIM4_Init(void);
+static void MX_TIM4_Init(uint16_t frequency);
 static void MX_UART4_Init(void);
 /* USER CODE BEGIN PFP */
 
@@ -67,7 +76,52 @@ static void MX_UART4_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+//button function to construct a button on a specific location
+void user_pwm_set_frequency(uint16_t frequency){
+MX_TIM4_Init(frequency);
+HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
+
+}
+
+void tone(int frequency, int time){
+user_pwm_set_frequency(frequency);
+HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
+HAL_Delay(time);
+HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
+}
+
+void Rickroll(){
+HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
+HAL_Delay(100);
+tone(196,125);
+tone(220,125);
+tone(261,125);
+tone(220,125);
+tone(329,325);
+HAL_Delay(50);
+tone(329,375);
+tone(293,750);
+HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
+}
+
+void timerEnds(){
+HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
+HAL_Delay(100);
+for(int i = 0; i<3; i++){
+tone(196,100);
+HAL_Delay(150);
+tone(220,100);
+HAL_Delay(650);
+}
+HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
+}
+//touch2Display function
+
+
+//testInterface function
+
 /* USER CODE END 0 */
+
 
 /**
   * @brief  The application entry point.
@@ -78,6 +132,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
+  
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -98,17 +153,80 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_FSMC_Init();
-  MX_TIM2_Init();
-  MX_TIM4_Init();
+	MX_TIM2_Init();
+  MX_TIM4_Init(256);
   MX_UART4_Init();
   /* USER CODE BEGIN 2 */
+	
+	macXPT2046_CS_DISABLE();
+	
+	LCD_INIT();
 
+
+	//while( ! XPT2046_Touch_Calibrate () );   
+
+	LCD_GramScan ( 1 );
+
+	int pageCounter = 0;
+	int timer = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+	
+	
   while (1)
   {
+    if ( ucXPT2046_TouchFlag == 1 )	         
+    {
+			Check_touchkey();			
+      ucXPT2046_TouchFlag = 0;
+			
+			
+    }	
+//		if(myCheck()){
+//		HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_5);
+//		HAL_Delay(500);
+//		if(testInterface()==1){
+//		loading();
+//		pageCounter = mainMenu();
+//		continue;
+//		}
+//		}
+		HAL_Delay(50);		
+		
+		switch(pageCounter){
+			case 0:
+				HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_5);
+				pageCounter = mainMenu();
+				break;
+			
+			case 1: 
+				loading();
+				timer = timerScreen();
+				pageCounter = timer%10;
+				timer = timer/10;
+				break;
+			
+			case 2:
+				//You can put your while loop here
+				
+				break;
+			
+			case 5:
+				pageCounter = timerCount(timer);
+				break;
+			
+			case 6:
+				timerEnds();
+				pageCounter = mainMenu();
+				break;
+			
+			default:
+				pageCounter = 0;
+				break;
+		}
+		
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -125,7 +243,7 @@ void SystemClock_Config(void)
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-  /** Initializes the CPU, AHB and APB busses clocks
+  /** Initializes the CPU, AHB and APB busses clocks 
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
@@ -138,7 +256,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  /** Initializes the CPU, AHB and APB busses clocks
+  /** Initializes the CPU, AHB and APB busses clocks 
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
@@ -151,9 +269,8 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  HAL_RCC_MCOConfig(RCC_MCO, RCC_MCO1SOURCE_PLLCLK, RCC_MCODIV_1);
+	HAL_RCC_MCOConfig(RCC_MCO, RCC_MCO1SOURCE_PLLCLK, RCC_MCODIV_1);
 }
-
 /**
   * @brief TIM2 Initialization Function
   * @param None
@@ -218,7 +335,7 @@ static void MX_TIM2_Init(void)
   * @param None
   * @retval None
   */
-static void MX_TIM4_Init(void)
+static void MX_TIM4_Init(uint16_t frequency)
 {
 
   /* USER CODE BEGIN TIM4_Init 0 */
@@ -235,7 +352,7 @@ static void MX_TIM4_Init(void)
   htim4.Instance = TIM4;
   htim4.Init.Prescaler = 0;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 234;
+  htim4.Init.Period = 60000/frequency;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
@@ -318,9 +435,9 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2|GPIO_PIN_0|GPIO_PIN_1, GPIO_PIN_RESET);
@@ -363,12 +480,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PA8 */
-  GPIO_InitStruct.Pin = GPIO_PIN_8;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI4_IRQn, 0, 0);
@@ -458,7 +569,7 @@ void Error_Handler(void)
   * @retval None
   */
 void assert_failed(uint8_t *file, uint32_t line)
-{
+{ 
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
      tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
