@@ -210,7 +210,8 @@ int main(void)
 			
 			case 2:
 				//You can put your while loop here
-				
+				//delete the "pageCounter = 0;" and place your loop here
+				pageCounter = 0;
 				break;
 			
 			case 5:
