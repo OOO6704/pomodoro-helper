@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under BSD 3-Clause license,
@@ -24,6 +24,12 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "lcdtp.h"
+#include "xpt2046.h"
+#include <time.h>
+#include "image.h"
+#include "interface.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -33,6 +39,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+//Own variables
+char charData[80];
+int16_t pointX;
+int16_t pointY;
 
 /* USER CODE END PD */
 
@@ -46,7 +56,6 @@ TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim4;
 
 UART_HandleTypeDef huart4;
-
 SRAM_HandleTypeDef hsram1;
 
 /* USER CODE BEGIN PV */
@@ -58,7 +67,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_FSMC_Init(void);
 static void MX_TIM2_Init(void);
-static void MX_TIM4_Init(void);
+static void MX_TIM4_Init(uint16_t frequency);
 static void MX_UART4_Init(void);
 /* USER CODE BEGIN PFP */
 
@@ -67,7 +76,68 @@ static void MX_UART4_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+#define SYNC 0xAA
+#define EXCODE 0x55
+
+typedef struct
+{
+    uint8_t Brain_Data[36];
+    uint8_t signal;
+    uint8_t attention;
+    uint8_t relax;
+    volatile uint8_t receive_flag;
+    volatile uint8_t wear_flag;
+    volatile uint8_t off_flag;
+    volatile uint8_t mode;
+    
+}Brain_DataTypeDef;
+
+//button function to construct a button on a specific location
+void user_pwm_set_frequency(uint16_t frequency){
+MX_TIM4_Init(frequency);
+HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
+
+}
+
+void tone(int frequency, int time){
+user_pwm_set_frequency(frequency);
+HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
+HAL_Delay(time);
+HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
+}
+
+void Rickroll(){
+HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
+HAL_Delay(100);
+tone(196,125);
+tone(220,125);
+tone(261,125);
+tone(220,125);
+tone(329,325);
+HAL_Delay(50);
+tone(329,375);
+tone(293,750);
+HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
+}
+
+void timerEnds(){
+HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
+HAL_Delay(100);
+for(int i = 0; i<3; i++){
+tone(196,100);
+HAL_Delay(150);
+tone(220,100);
+HAL_Delay(650);
+}
+HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
+}
+//touch2Display function
+
+
+//testInterface function
+
 /* USER CODE END 0 */
+
 
 /**
   * @brief  The application entry point.
@@ -78,6 +148,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
+  
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -98,17 +169,212 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_FSMC_Init();
-  MX_TIM2_Init();
-  MX_TIM4_Init();
+	MX_TIM2_Init();
+  MX_TIM4_Init(256);
   MX_UART4_Init();
   /* USER CODE BEGIN 2 */
+	
+	macXPT2046_CS_DISABLE();
+	
+	LCD_INIT();
+
+
+	//while( ! XPT2046_Touch_Calibrate () );   
+
+	LCD_GramScan ( 1 );
+
+	int pageCounter = 0;
+	int timer = 0;
+
+	char charValue[80];	
+	uint8_t rx_buffer[256];
+	
+	char SignalValue[80];
+	char AttentionValue[80];
+	char RelaxValue[80];
+	char WearFlag[80];
+	
+	
+	Brain_DataTypeDef Brain_DataStruct;
+	//init Brain datastruct
+	volatile uint16_t over_time_counter = 0;
+  Brain_DataStruct.receive_flag = 0;
+  Brain_DataStruct.wear_flag = 0;
+  Brain_DataStruct.mode = 3;
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+	
+	
   while (1)
   {
+    if ( ucXPT2046_TouchFlag == 1 )	         
+    {
+			Check_touchkey();			
+      ucXPT2046_TouchFlag = 0;
+			
+			
+    }	
+//		if(myCheck()){
+//		HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_5);
+//		HAL_Delay(500);
+//		if(testInterface()==1){
+//		loading();
+//		pageCounter = mainMenu();
+//		continue;
+//		}
+//		}
+		HAL_Delay(50);		
+		
+		switch(pageCounter){
+			case 0:
+				HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_5);
+				pageCounter = mainMenu();
+				break;
+			
+			case 1: 
+				loading();
+				timer = timerScreen();
+				pageCounter = timer%10;
+				timer = timer/10;
+				break;
+			
+			case 2:
+				//You can put your while loop here
+			  LCD_Clear(0,0,240,340,WHITE);
+				while (1)
+				{
+					LCD_DrawString(0, 0, "Data:");
+          LCD_DrawString(0, 32, "small packet:");
+					LCD_DrawString(0, 64, "SY");
+					LCD_DrawString(20, 64, "SY");
+					LCD_DrawString(40, 64, "PL");
+					LCD_DrawString(60, 64, "CODE");
+					LCD_DrawString(100, 64, "VL");
+					LCD_DrawString(120, 64, "V1");
+					LCD_DrawString(140, 64, "V2");
+					LCD_DrawString(160, 64, "CHKSUM");
+					LCD_DrawString(0, 120, "Big packet:");
+					sprintf(charValue, "%d", 0);
+					
+					HAL_UART_Receive(&huart4,rx_buffer,256,2000);
+					
+					for(int i = 0; i<256; i++){
+						
+						sprintf(charValue,"%02x", rx_buffer[i]);
+						LCD_DrawString(100 , 0, charValue);
+						
+						if(rx_buffer[i]==SYNC && rx_buffer[i+1]==SYNC && rx_buffer[i+2]==0x04) {
+							sprintf(charValue,"%02x", rx_buffer[i]);
+							LCD_DrawString(0, 96, charValue);
+							sprintf(charValue,"%02x", rx_buffer[i+1]);
+							LCD_DrawString(20, 96, charValue);
+							sprintf(charValue,"%02x", rx_buffer[i+2]);
+							LCD_DrawString(40, 96, charValue);
+							sprintf(charValue,"%02x", rx_buffer[i+3]);
+							LCD_DrawString(60, 96, charValue);
+							sprintf(charValue,"%02x", rx_buffer[i+4]);
+							LCD_DrawString(100, 96, charValue);
+							sprintf(charValue,"%02x", rx_buffer[i+5]);
+							LCD_DrawString(120, 96, charValue);
+							sprintf(charValue,"%02x", rx_buffer[i+6]);
+							LCD_DrawString(140, 96, charValue);
+							sprintf(charValue,"%02x", rx_buffer[i+7]);
+							LCD_DrawString(160, 96, charValue);
+						}
+						
+						//Check packet header 
+						
+						if(rx_buffer[i]==SYNC && rx_buffer[i+1]==SYNC && rx_buffer[i+2]==0x20) {
+							for (int k=0; k< 13;k++) {
+								sprintf(charValue,"%02x", rx_buffer[i+k]);
+								LCD_DrawString(0+18*k,232 ,charValue);
+							}
+							for (int k=13; k< 25;k++) {
+								sprintf(charValue,"%02x", rx_buffer[i+k]);
+								LCD_DrawString(0+18*(k-13),264 ,charValue);
+							}
+							for (int k=25; k< 36;k++) {
+								sprintf(charValue,"%02x", rx_buffer[i+k]);
+								LCD_DrawString(0+18*(k-25),296 ,charValue);
+							}
+
+							
+							uint16_t checksum = 0;
+							for(int n=0;n<32;n++) {
+								Brain_DataStruct.Brain_Data[n]  = rx_buffer[i+3+n];
+								checksum += Brain_DataStruct.Brain_Data[n];
+							}
+							checksum = (~checksum)&0xff;
+							if (checksum == rx_buffer[i+35]) {
+								checksum = 0;
+								Brain_DataStruct.signal=Brain_DataStruct.Brain_Data[1];
+								Brain_DataStruct.attention=Brain_DataStruct.Brain_Data[29];
+								Brain_DataStruct.relax=Brain_DataStruct.Brain_Data[31];
+								if ((Brain_DataStruct.signal != 29) && (Brain_DataStruct.signal != 54) &&
+											(Brain_DataStruct.signal != 55) && (Brain_DataStruct.signal != 56) &&
+											(Brain_DataStruct.signal != 80) && (Brain_DataStruct.signal != 81) &&
+											(Brain_DataStruct.signal != 82) && (Brain_DataStruct.signal != 107)&&
+											(Brain_DataStruct.signal != 200))
+								{
+									Brain_DataStruct.wear_flag = 1;
+								}
+								else
+								{
+									Brain_DataStruct.wear_flag = 0;
+								}
+							}
+							
+							LCD_DrawString(0, 150, "Signal:");
+							sprintf(SignalValue,"%02x", Brain_DataStruct.signal);
+							LCD_DrawString(120 ,150,SignalValue);
+							
+							LCD_DrawString(0, 170, "Attention:");
+							sprintf(AttentionValue,"%02x", Brain_DataStruct.attention);
+							LCD_DrawString(120 ,170 ,AttentionValue);
+
+						  LCD_DrawString(0, 190, "Relax:");
+							sprintf(RelaxValue,"%02x", Brain_DataStruct.relax);
+							LCD_DrawString(120 ,190 ,RelaxValue);
+							
+						  LCD_DrawString(100, 120, "Wear:");
+							sprintf(WearFlag,"%x", Brain_DataStruct.wear_flag);
+							LCD_DrawString(150 ,120 ,WearFlag);
+							
+							break;
+						}
+						else {
+							continue;
+						}
+						
+						
+						
+					}
+					
+					//HAL_Delay(2000);
+					
+					/* USER CODE END WHILE */
+
+					/* USER CODE BEGIN 3 */
+				}
+				break;
+			
+			case 5:
+				pageCounter = timerCount(timer);
+				break;
+			
+			case 6:
+				timerEnds();
+				pageCounter = mainMenu();
+				break;
+			
+			default:
+				pageCounter = 0;
+				break;
+		}
+		
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -125,7 +391,7 @@ void SystemClock_Config(void)
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-  /** Initializes the CPU, AHB and APB busses clocks
+  /** Initializes the CPU, AHB and APB busses clocks 
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
@@ -138,7 +404,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  /** Initializes the CPU, AHB and APB busses clocks
+  /** Initializes the CPU, AHB and APB busses clocks 
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
@@ -151,9 +417,8 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  HAL_RCC_MCOConfig(RCC_MCO, RCC_MCO1SOURCE_PLLCLK, RCC_MCODIV_1);
+	HAL_RCC_MCOConfig(RCC_MCO, RCC_MCO1SOURCE_PLLCLK, RCC_MCODIV_1);
 }
-
 /**
   * @brief TIM2 Initialization Function
   * @param None
@@ -218,7 +483,7 @@ static void MX_TIM2_Init(void)
   * @param None
   * @retval None
   */
-static void MX_TIM4_Init(void)
+static void MX_TIM4_Init(uint16_t frequency)
 {
 
   /* USER CODE BEGIN TIM4_Init 0 */
@@ -235,7 +500,7 @@ static void MX_TIM4_Init(void)
   htim4.Instance = TIM4;
   htim4.Init.Prescaler = 0;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 234;
+  htim4.Init.Period = 60000/frequency;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
@@ -318,9 +583,9 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2|GPIO_PIN_0|GPIO_PIN_1, GPIO_PIN_RESET);
@@ -363,12 +628,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PA8 */
-  GPIO_InitStruct.Pin = GPIO_PIN_8;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI4_IRQn, 0, 0);
@@ -458,7 +717,7 @@ void Error_Handler(void)
   * @retval None
   */
 void assert_failed(uint8_t *file, uint32_t line)
-{
+{ 
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
      tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
