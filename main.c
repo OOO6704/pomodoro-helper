@@ -101,6 +101,15 @@ tone(329,325);
 HAL_Delay(50);
 tone(329,375);
 tone(293,750);
+	
+tone(196,125);
+tone(220,125);
+tone(261,125);
+tone(220,125);
+tone(293,325);
+HAL_Delay(50);
+tone(293,375);
+tone(261,750);
 HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
 }
 
@@ -108,10 +117,11 @@ void timerEnds(){
 HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
 HAL_Delay(100);
 for(int i = 0; i<3; i++){
-tone(196,100);
+tone(999,100);
 HAL_Delay(150);
-tone(220,100);
+tone(999,100);
 HAL_Delay(650);
+Rickroll();
 }
 HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
 }
@@ -162,7 +172,7 @@ int main(void)
 	
 	LCD_INIT();
 
-
+	HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_1);
 	//while( ! XPT2046_Touch_Calibrate () );   
 
 	LCD_GramScan ( 1 );
