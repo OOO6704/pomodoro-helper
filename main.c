@@ -75,6 +75,21 @@ static void MX_UART4_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+#define SYNC 0xAA
+#define EXCODE 0x55
+
+typedef struct
+{
+    uint8_t Brain_Data[36];
+    uint8_t signal;
+    uint8_t attention;
+    uint8_t relax;
+    volatile uint8_t receive_flag;
+    volatile uint8_t wear_flag;
+    volatile uint8_t off_flag;
+    volatile uint8_t mode;
+    
+}Brain_DataTypeDef;
 
 //button function to construct a button on a specific location
 void user_pwm_set_frequency(uint16_t frequency){
@@ -93,23 +108,23 @@ HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
 void Rickroll(){
 HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
 HAL_Delay(100);
-tone(196,125);
-tone(220,125);
-tone(261,125);
-tone(220,125);
-tone(329,325);
+tone(392,125);
+tone(440,125);
+tone(522,125);
+tone(440,125);
+tone(658,325);
 HAL_Delay(50);
-tone(329,375);
-tone(293,750);
+tone(658,375);
+tone(586,750);
 	
-tone(196,125);
-tone(220,125);
-tone(261,125);
-tone(220,125);
-tone(293,325);
+tone(392,125);
+tone(440,125);
+tone(522,125);
+tone(440,125);
+tone(586,325);
 HAL_Delay(50);
-tone(293,375);
-tone(261,750);
+tone(586,375);
+tone(522,750);
 HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
 }
 
@@ -121,8 +136,8 @@ tone(999,100);
 HAL_Delay(150);
 tone(999,100);
 HAL_Delay(650);
-Rickroll();
 }
+Rickroll();
 HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
 }
 //touch2Display function
@@ -179,6 +194,22 @@ int main(void)
 
 	int pageCounter = 0;
 	int timer = 0;
+	char charValue[80];	
+	uint8_t rx_buffer[256];
+	
+	char SignalValue[80];
+	char AttentionValue[80];
+	char RelaxValue[80];
+	char WearFlag[80];
+	
+	
+	Brain_DataTypeDef Brain_DataStruct;
+	//init Brain datastruct
+	volatile uint16_t over_time_counter = 0;
+  Brain_DataStruct.receive_flag = 0;
+  Brain_DataStruct.wear_flag = 0;
+  Brain_DataStruct.mode = 3;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -220,8 +251,119 @@ int main(void)
 			
 			case 2:
 				//You can put your while loop here
-				//delete the "pageCounter = 0;" and place your loop here
-				pageCounter = 0;
+			  LCD_Clear(0,0,240,340,WHITE);
+				while (1)
+				{
+					LCD_DrawString(0, 0, "Data:");
+          LCD_DrawString(0, 32, "small packet:");
+					LCD_DrawString(0, 64, "SY");
+					LCD_DrawString(20, 64, "SY");
+					LCD_DrawString(40, 64, "PL");
+					LCD_DrawString(60, 64, "CODE");
+					LCD_DrawString(100, 64, "VL");
+					LCD_DrawString(120, 64, "V1");
+					LCD_DrawString(140, 64, "V2");
+					LCD_DrawString(160, 64, "CHKSUM");
+					LCD_DrawString(0, 120, "Big packet:");
+					sprintf(charValue, "%d", 0);
+					
+					HAL_UART_Receive(&huart4,rx_buffer,256,2000);
+					
+					for(int i = 0; i<256; i++){
+						
+						sprintf(charValue,"%02x", rx_buffer[i]);
+						LCD_DrawString(100 , 0, charValue);
+						
+						if(rx_buffer[i]==SYNC && rx_buffer[i+1]==SYNC && rx_buffer[i+2]==0x04) {
+							sprintf(charValue,"%02x", rx_buffer[i]);
+							LCD_DrawString(0, 96, charValue);
+							sprintf(charValue,"%02x", rx_buffer[i+1]);
+							LCD_DrawString(20, 96, charValue);
+							sprintf(charValue,"%02x", rx_buffer[i+2]);
+							LCD_DrawString(40, 96, charValue);
+							sprintf(charValue,"%02x", rx_buffer[i+3]);
+							LCD_DrawString(60, 96, charValue);
+							sprintf(charValue,"%02x", rx_buffer[i+4]);
+							LCD_DrawString(100, 96, charValue);
+							sprintf(charValue,"%02x", rx_buffer[i+5]);
+							LCD_DrawString(120, 96, charValue);
+							sprintf(charValue,"%02x", rx_buffer[i+6]);
+							LCD_DrawString(140, 96, charValue);
+							sprintf(charValue,"%02x", rx_buffer[i+7]);
+							LCD_DrawString(160, 96, charValue);
+						}
+						
+						//Check packet header 
+						
+						if(rx_buffer[i]==SYNC && rx_buffer[i+1]==SYNC && rx_buffer[i+2]==0x20) {
+							for (int k=0; k< 13;k++) {
+								sprintf(charValue,"%02x", rx_buffer[i+k]);
+								LCD_DrawString(0+18*k,232 ,charValue);
+							}
+							for (int k=13; k< 25;k++) {
+								sprintf(charValue,"%02x", rx_buffer[i+k]);
+								LCD_DrawString(0+18*(k-13),264 ,charValue);
+							}
+							for (int k=25; k< 36;k++) {
+								sprintf(charValue,"%02x", rx_buffer[i+k]);
+								LCD_DrawString(0+18*(k-25),296 ,charValue);
+							}
+
+							
+							uint16_t checksum = 0;
+							for(int n=0;n<32;n++) {
+								Brain_DataStruct.Brain_Data[n]  = rx_buffer[i+3+n];
+								checksum += Brain_DataStruct.Brain_Data[n];
+							}
+							checksum = (~checksum)&0xff;
+							if (checksum == rx_buffer[i+35]) {
+								checksum = 0;
+								Brain_DataStruct.signal=Brain_DataStruct.Brain_Data[1];
+								Brain_DataStruct.attention=Brain_DataStruct.Brain_Data[29];
+								Brain_DataStruct.relax=Brain_DataStruct.Brain_Data[31];
+								if ((Brain_DataStruct.signal != 29) && (Brain_DataStruct.signal != 54) &&
+											(Brain_DataStruct.signal != 55) && (Brain_DataStruct.signal != 56) &&
+											(Brain_DataStruct.signal != 80) && (Brain_DataStruct.signal != 81) &&
+											(Brain_DataStruct.signal != 82) && (Brain_DataStruct.signal != 107)&&
+											(Brain_DataStruct.signal != 200))
+								{
+									Brain_DataStruct.wear_flag = 1;
+								}
+								else
+								{
+									Brain_DataStruct.wear_flag = 0;
+								}
+							}
+							
+							LCD_DrawString(0, 150, "Signal:");
+							sprintf(SignalValue,"%02x", Brain_DataStruct.signal);
+							LCD_DrawString(120 ,150,SignalValue);
+							
+							LCD_DrawString(0, 170, "Attention:");
+							sprintf(AttentionValue,"%02x", Brain_DataStruct.attention);
+							LCD_DrawString(120 ,170 ,AttentionValue);
+
+						  LCD_DrawString(0, 190, "Relax:");
+							sprintf(RelaxValue,"%02x", Brain_DataStruct.relax);
+							LCD_DrawString(120 ,190 ,RelaxValue);
+							
+						  LCD_DrawString(100, 120, "Wear:");
+							sprintf(WearFlag,"%x", Brain_DataStruct.wear_flag);
+							LCD_DrawString(150 ,120 ,WearFlag);
+							
+							break;
+						}
+						else {
+							continue;
+						}
+						
+						
+						
+					}
+					
+					//HAL_Delay(2000);
+					
+				}
 				break;
 			
 			case 5:
