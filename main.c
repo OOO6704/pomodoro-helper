@@ -128,7 +128,35 @@ tone(522,750);
 HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
 }
 
-void timerEnds(){
+void mii(){
+HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
+HAL_Delay(100);
+tone(370,375);
+HAL_Delay(125);
+tone(440,250);
+tone(554,500);
+tone(440,500);
+tone(370,250);
+tone(294,188);
+HAL_Delay(62);
+tone(294,188);
+HAL_Delay(62);	
+tone(294,188);
+HAL_Delay(1562);
+	
+tone(294,250);
+tone(370,250);
+tone(440,375);
+HAL_Delay(125);
+tone(370,250);
+HAL_Delay(500);
+tone(659,750);
+tone(622,250);
+tone(587,125);
+HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
+}
+
+void timerEnds(int mode){
 HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
 HAL_Delay(100);
 for(int i = 0; i<3; i++){
@@ -137,7 +165,15 @@ HAL_Delay(150);
 tone(999,100);
 HAL_Delay(650);
 }
-Rickroll();
+if(mode==0){
+	//Pomodoro timer ends
+	Rickroll();
+}	
+
+else if(mode == 1){
+	//Short break timer ends
+	mii();
+}
 HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
 }
 //touch2Display function
@@ -244,9 +280,10 @@ int main(void)
 			
 			case 1: 
 				loading();
-				timer = timerScreen();
-				pageCounter = timer%10;
-				timer = timer/10;
+				//timer = timerScreen();
+				//pageCounter = timer%10;
+				//timer = timer/10;
+				pageCounter = timerCount(2500);
 				break;
 			
 			case 2:
@@ -367,14 +404,21 @@ int main(void)
 				break;
 			
 			case 5:
-				pageCounter = timerCount(timer);
+				pageCounter = timerCount(2500);
 				break;
 			
 			case 6:
-				timerEnds();
-				pageCounter = mainMenu();
+				//Pomodoro timer ends.
+				timerEnds(0);
+				pageCounter = timerCount(500);
 				break;
 			
+			case 7:
+				//short break timer ends.
+				timerEnds(1);
+				pageCounter = timerCount(2500);
+				break;
+				
 			default:
 				pageCounter = 0;
 				break;
