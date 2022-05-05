@@ -306,7 +306,11 @@ int timerCount(int timer){
 	int min = timer/100;
 	int sec = timer%100;
 	int time = 60*min+sec;
-	LCD_DrawString(36,8,"Now its time to work!");
+	if(timer == 2500){
+	LCD_DrawString(36,8,"Now its time to work!");}
+	else if(timer == 500){
+	LCD_DrawString(24,8,"Let's take a good break!");
+	}
 	LCD_DrawString(52,49,"Min:");
 	LCD_DrawString(178,49,"Sec:");
 	bigNumber(5,70,min/10);
@@ -348,16 +352,23 @@ int timerCount(int timer){
 		button(130,280,100,20,"Stop!",5,RED,WHITE);
 		}
 		else if(checkButton(1)==2){
-		return 0;
+		time = 0;
 		}
 		HAL_Delay(100);
 		}
 	}
+	if(timer == 2500){
 	LCD_Clear(0,0,240,320,0xDB6E);
 	LCD_DrawString_Color(60,144,"Focus time ends!",0xDB6E,WHITE);
 	LCD_DrawString_Color(12,164,"Time to take a short break!",0xDB6E,WHITE);
 	//Timer ends!
-	return 6;
+	return 6;}
+	else if(timer == 500){
+	LCD_Clear(0,0,240,320,0x4D18);
+	LCD_DrawString_Color(52,144,"Short break ends!",0x4D18,WHITE);
+	LCD_DrawString_Color(20,164,"Time to get back to work!",0x4D18,WHITE);
+	return 7;
+	}
 }
 
 //Check button from different cases
