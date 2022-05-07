@@ -100,7 +100,11 @@ typedef struct
     volatile uint8_t wear_flag;
     volatile uint8_t off_flag;
     volatile uint8_t mode;
-    
+    volatile uint32_t LowAlpha;
+    volatile uint32_t HighAlpha;
+    volatile uint32_t LowBeta;
+    volatile uint32_t HighBeta;
+
 }Brain_DataTypeDef;
 
 //button function to construct a button on a specific location
@@ -409,6 +413,11 @@ int main(void)
 						  LCD_DrawString(100, 120, "Wear:");
 							sprintf(WearFlag,"%x", Brain_DataStruct.wear_flag);
 							LCD_DrawString(150 ,120 ,WearFlag);
+							
+							Brain_DataStruct.LowAlpha = (Brain_DataStruct.Brain_Data[13]<<16)| (Brain_DataStruct.Brain_Data[14]<<8) | Brain_DataStruct.Brain_Data[15];
+              Brain_DataStruct.HighAlpha = (Brain_DataStruct.Brain_Data[16]<<16)| (Brain_DataStruct.Brain_Data[17]<<8) | Brain_DataStruct.Brain_Data[18];
+              Brain_DataStruct.LowBeta = (Brain_DataStruct.Brain_Data[19]<<16)| (Brain_DataStruct.Brain_Data[20]<<8) | Brain_DataStruct.Brain_Data[21];
+              Brain_DataStruct.HighBeta = (Brain_DataStruct.Brain_Data[22]<<16)| (Brain_DataStruct.Brain_Data[23]<<8) | Brain_DataStruct.Brain_Data[24];
 							
 							break;
 						}

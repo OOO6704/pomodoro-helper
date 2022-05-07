@@ -330,6 +330,7 @@ int timerCount(int timer){
 		bigNumber(130,70,time%60/10);
 		bigNumber(185,70,time%60%10);
 		
+		//update the two dots
 		if(time%2==1){
 		LCD_Clear(118,106,4,4,BLUE);
 		LCD_Clear(118,130,4,4,BLUE);
@@ -341,6 +342,11 @@ int timerCount(int timer){
 		time--;
 		
 		for(int i=0; i<10; i++){
+		if(i == 1){
+		
+		
+		
+		}
 		if(checkButton(1)==1){
 		button(10,280,100,20,"Continue",8,CYAN,BLACK);
 		button(130,280,100,20,"Stop!",5,GREY,WHITE);
