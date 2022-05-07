@@ -5,6 +5,7 @@
 #include "UartRingbuffer_multi.h"
 
 static char charData[320];
+static uint8_t uartData[80];
 static int16_t pointX;
 static int16_t pointY;
 extern UART_HandleTypeDef huart1;
@@ -349,12 +350,10 @@ int timerCount(int timer){
 		
 		//Uart send the brainstruct
 		//test function
-		HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_0);
-		sprintf(charData,"%d",time);
+		uartData[0] = 1;
 		LCD_DrawString(120,200,charData);
 		HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_1);
-		Uart_sendstring("Hello",&huart1);	
-			HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_5);
+		HAL_UART_Transmit(&huart1,uartData,sizeof(uartData),10);	
 		}
 		if(checkButton(1)==1){
 		button(10,280,100,20,"Continue",8,CYAN,BLACK);

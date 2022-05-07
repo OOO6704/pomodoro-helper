@@ -30,7 +30,6 @@
 #include "image.h"
 #include "interface.h"
 #include <string.h>
-#include "UartRingbuffer_multi.h"
 
 /* USER CODE END Includes */
 
@@ -276,7 +275,7 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
-
+	
   /* USER CODE BEGIN SysInit */
 	
   /* USER CODE END SysInit */
@@ -286,14 +285,14 @@ int main(void)
   MX_FSMC_Init();
   MX_TIM2_Init();
   MX_TIM4_Init(256);
-  MX_UART4_Init();
+	MX_UART4_Init();
   MX_USART1_UART_Init();
 	
   /* USER CODE BEGIN 2 */
 	
 	macXPT2046_CS_DISABLE();
-	Ringbuf_init();
-	Uart_sendstring("Testing", &huart1);
+	
+
 	LCD_INIT();
 	HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_1);
 
@@ -303,6 +302,19 @@ int main(void)
 
 	int pageCounter = 0;
 	int timer = 0;
+	
+		//UART DEBUG SESSION Begins
+	
+	int a = 79;
+	uint8_t uartData[10]; 
+	uartData[0] = a;
+	for(int i = 0; i<10; i++){
+	HAL_UART_Transmit(&huart1,uartData,sizeof(uartData),10);
+	HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_0);
+		HAL_Delay(1000);
+	}
+	
+		//UART DEBUG SESSION Ends
 	
 	char SignalValue[80];
 	char AttentionValue[80];
