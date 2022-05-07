@@ -107,6 +107,8 @@ typedef struct
 
 }Brain_DataTypeDef;
 
+Brain_DataTypeDef Brain_DataStruct;
+
 //button function to construct a button on a specific location
 void user_pwm_set_frequency(uint16_t frequency){
 MX_TIM4_Init(frequency);
@@ -209,6 +211,48 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	HAL_UART_Receive_IT(&huart4, (uint8_t *)&aRxBuffer, 1);
 }
 
+void updateBrainData() {
+		for(int i = 0; i<256; i++){
+			
+			if(rx_buffer[i]==SYNC && rx_buffer[i+1]==SYNC && rx_buffer[i+2]==0x20) {
+				uint16_t checksum = 0;
+				for(int n=0;n<32;n++) {
+					Brain_DataStruct.Brain_Data[n]  = rx_buffer[i+3+n];
+					checksum += Brain_DataStruct.Brain_Data[n];
+				}
+				checksum = (~checksum)&0xff;
+				if (checksum == rx_buffer[i+35]) {
+					checksum = 0;
+					Brain_DataStruct.signal=Brain_DataStruct.Brain_Data[1];
+					Brain_DataStruct.attention=Brain_DataStruct.Brain_Data[29];
+					Brain_DataStruct.relax=Brain_DataStruct.Brain_Data[31];
+					if ((Brain_DataStruct.signal != 29) && (Brain_DataStruct.signal != 54) &&
+								(Brain_DataStruct.signal != 55) && (Brain_DataStruct.signal != 56) &&
+								(Brain_DataStruct.signal != 80) && (Brain_DataStruct.signal != 81) &&
+								(Brain_DataStruct.signal != 82) && (Brain_DataStruct.signal != 107)&&
+								(Brain_DataStruct.signal != 200))
+					{
+						Brain_DataStruct.wear_flag = 1;
+					}
+					else
+					{
+						Brain_DataStruct.wear_flag = 0;
+					}
+				}
+				
+				Brain_DataStruct.LowAlpha = (Brain_DataStruct.Brain_Data[13]<<16)| (Brain_DataStruct.Brain_Data[14]<<8) | Brain_DataStruct.Brain_Data[15];
+				Brain_DataStruct.HighAlpha = (Brain_DataStruct.Brain_Data[16]<<16)| (Brain_DataStruct.Brain_Data[17]<<8) | Brain_DataStruct.Brain_Data[18];
+				Brain_DataStruct.LowBeta = (Brain_DataStruct.Brain_Data[19]<<16)| (Brain_DataStruct.Brain_Data[20]<<8) | Brain_DataStruct.Brain_Data[21];
+				Brain_DataStruct.HighBeta = (Brain_DataStruct.Brain_Data[22]<<16)| (Brain_DataStruct.Brain_Data[23]<<8) | Brain_DataStruct.Brain_Data[24];
+				
+				break;
+			}
+			else {
+				continue;
+			}	
+		}		
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -264,7 +308,6 @@ int main(void)
 	char WearFlag[80];
 	
 	
-	Brain_DataTypeDef Brain_DataStruct;
 	//init Brain datastruct
 	volatile uint16_t over_time_counter = 0;
   Brain_DataStruct.receive_flag = 0;
