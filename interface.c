@@ -4,9 +4,11 @@
 #include "image.h"
 #include "UartRingbuffer_multi.h"
 
-static char charData[80];
+static char charData[320];
 static int16_t pointX;
 static int16_t pointY;
+extern UART_HandleTypeDef huart1;
+extern void Uart_sendstring (const char *s, UART_HandleTypeDef *uart);
 
 int button(uint16_t usC, uint16_t usP, int width, int height, const char *pstr, int wordCount, uint16_t color, uint16_t wordColor){
 	LCD_Clear(usC,usP,width, height,color);
@@ -323,7 +325,7 @@ int timerCount(int timer){
 	button(10,280,100,20,"Pause",5,CYAN,BLACK);
 	button(130,280,100,20,"Stop!",5,RED,WHITE);
 	
-	while(time>=0){
+		while(time>=0){
 		//update big number time
 		bigNumber(5,70,time/60/10);
 		bigNumber(60,70,time/60%10);
@@ -343,9 +345,16 @@ int timerCount(int timer){
 		
 		for(int i=0; i<10; i++){
 		if(i == 1){
+		// on the first 0.1 second, update the brainstruct
 		
-		
-		
+		//Uart send the brainstruct
+		//test function
+		HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_0);
+		sprintf(charData,"%d",time);
+		LCD_DrawString(120,200,charData);
+		HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_1);
+		Uart_sendstring("Hello",&huart1);	
+			HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_5);
 		}
 		if(checkButton(1)==1){
 		button(10,280,100,20,"Continue",8,CYAN,BLACK);

@@ -271,7 +271,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+	
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -288,10 +288,12 @@ int main(void)
   MX_TIM4_Init(256);
   MX_UART4_Init();
   MX_USART1_UART_Init();
+	
   /* USER CODE BEGIN 2 */
 	
 	macXPT2046_CS_DISABLE();
-	
+	Ringbuf_init();
+	Uart_sendstring("Testing", &huart1);
 	LCD_INIT();
 	HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_1);
 
