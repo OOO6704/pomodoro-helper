@@ -2,6 +2,7 @@
 #include "lcdtp.h"
 #include "xpt2046.h"
 #include "image.h"
+#include "UartRingbuffer_multi.h"
 
 static char charData[80];
 static int16_t pointX;
@@ -323,10 +324,12 @@ int timerCount(int timer){
 	button(130,280,100,20,"Stop!",5,RED,WHITE);
 	
 	while(time>=0){
+		//update big number time
 		bigNumber(5,70,time/60/10);
 		bigNumber(60,70,time/60%10);
 		bigNumber(130,70,time%60/10);
 		bigNumber(185,70,time%60%10);
+		
 		if(time%2==1){
 		LCD_Clear(118,106,4,4,BLUE);
 		LCD_Clear(118,130,4,4,BLUE);
