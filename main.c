@@ -289,7 +289,6 @@ int main(void)
   Brain_DataStruct.mode = 3;
   HAL_UART_Receive_IT(&huart4,&aRxBuffer,1);
 	
-	
   /* USER CODE END 2 */
 
   /* Infinite loop */
