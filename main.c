@@ -76,7 +76,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_FSMC_Init(void);
 static void MX_TIM2_Init(void);
-static void MX_TIM4_Init(void);
+static void MX_TIM4_Init(uint16_t frequency);
 static void MX_UART4_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
@@ -104,7 +104,7 @@ typedef struct
 
 //button function to construct a button on a specific location
 void user_pwm_set_frequency(uint16_t frequency){
-MX_TIM4_Init();
+MX_TIM4_Init(frequency);
 HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
 
 }
@@ -236,7 +236,7 @@ int main(void)
   MX_GPIO_Init();
   MX_FSMC_Init();
   MX_TIM2_Init();
-  MX_TIM4_Init();
+  MX_TIM4_Init(256);
   MX_UART4_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
@@ -557,7 +557,7 @@ static void MX_TIM2_Init(void)
   * @param None
   * @retval None
   */
-static void MX_TIM4_Init(void)
+static void MX_TIM4_Init(uint16_t frequency)
 {
 
   /* USER CODE BEGIN TIM4_Init 0 */
@@ -574,7 +574,7 @@ static void MX_TIM4_Init(void)
   htim4.Instance = TIM4;
   htim4.Init.Prescaler = 0;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 234;
+  htim4.Init.Period = 60000/frequency;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
