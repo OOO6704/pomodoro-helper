@@ -35,3 +35,4 @@ touchpad\main_1.o: ../Src/image.h
 touchpad\main_1.o: ../Src/interface.h
 touchpad\main_1.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 touchpad\main_1.o: ../Src/UartRingbuffer_multi.h
+touchpad\main_1.o: ../Src/tone.h

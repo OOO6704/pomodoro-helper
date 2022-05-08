@@ -21,6 +21,23 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+//special type
+typedef struct
+{
+    uint8_t Brain_Data[36];
+    uint8_t signal;
+    uint8_t attention;
+    uint8_t relax;
+    volatile uint8_t receive_flag;
+    volatile uint8_t wear_flag;
+    volatile uint8_t off_flag;
+    volatile uint8_t mode;
+    volatile uint32_t LowAlpha;
+    volatile uint32_t HighAlpha;
+    volatile uint32_t LowBeta;
+    volatile uint32_t HighBeta;
+
+}Brain_DataTypeDef;
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -31,6 +48,7 @@
 #include "interface.h"
 #include <string.h>
 #include "UartRingbuffer_multi.h"
+#include "tone.h"
 
 /* USER CODE END Includes */
 
@@ -90,22 +108,7 @@ static void MX_USART1_UART_Init(void);
 #define SYNC 0xAA
 #define EXCODE 0x55
 
-typedef struct
-{
-    uint8_t Brain_Data[36];
-    uint8_t signal;
-    uint8_t attention;
-    uint8_t relax;
-    volatile uint8_t receive_flag;
-    volatile uint8_t wear_flag;
-    volatile uint8_t off_flag;
-    volatile uint8_t mode;
-    volatile uint32_t LowAlpha;
-    volatile uint32_t HighAlpha;
-    volatile uint32_t LowBeta;
-    volatile uint32_t HighBeta;
 
-}Brain_DataTypeDef;
 
 Brain_DataTypeDef Brain_DataStruct;
 
@@ -123,47 +126,7 @@ HAL_Delay(time);
 HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
 }
 
-void Rickroll(){
-HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
-HAL_Delay(100);
-tone(196,125);
-tone(220,125);
-tone(261,125);
-tone(220,125);
-tone(329,325);
-HAL_Delay(50);
-tone(329,375);
-tone(293,750);
-HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
-}
 
-void mii(){
-HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
-HAL_Delay(100);
-tone(370,375);
-HAL_Delay(125);
-tone(440,250);
-tone(554,500);
-tone(440,500);
-tone(370,250);
-tone(294,188);
-HAL_Delay(62);
-tone(294,188);
-HAL_Delay(62);	
-tone(294,188);
-HAL_Delay(1562);
-	
-tone(294,250);
-tone(370,250);
-tone(440,375);
-HAL_Delay(125);
-tone(370,250);
-HAL_Delay(500);
-tone(659,750);
-tone(622,250);
-tone(587,125);
-HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
-}
 
 void timerEnds(int mode){
 HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
@@ -301,7 +264,6 @@ int main(void)
 	LCD_GramScan ( 1 );
 
 	int pageCounter = 0;
-	int timer = 0;
 	
 	char SignalValue[80];
 	char AttentionValue[80];
@@ -315,8 +277,6 @@ int main(void)
   Brain_DataStruct.wear_flag = 0;
   Brain_DataStruct.mode = 3;
   HAL_UART_Receive_IT(&huart4,&aRxBuffer,1);
-
-	int a = 0;
 
 	Ringbuf_init();
   /* USER CODE END 2 */

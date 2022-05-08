@@ -3,7 +3,7 @@
 <title>Static Call Graph - [TouchPad\TouchPad.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image TouchPad\TouchPad.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060422: Last Updated: Sun May 08 19:59:06 2022
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060422: Last Updated: Sun May 08 20:15:14 2022
 <BR><P>
 <H3>Maximum Stack Usage =        608 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -645,11 +645,11 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GetTick
 </UL>
-<BR>[Called By]<UL><LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tone
-<LI><a href="#[dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timerEnds
-<LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mii
-<LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<BR>[Called By]<UL><LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mii
 <LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Rickroll
+<LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tone
+<LI><a href="#[dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timerEnds
+<LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 <LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timerCount
 <LI><a href="#[d7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;loading
 </UL>
@@ -900,10 +900,10 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM_CCxChannelCmd
 </UL>
-<BR>[Called By]<UL><LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tone
-<LI><a href="#[dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timerEnds
-<LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mii
+<BR>[Called By]<UL><LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mii
 <LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Rickroll
+<LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tone
+<LI><a href="#[dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timerEnds
 </UL>
 
 <P><STRONG><a name="[99]"></a>HAL_TIM_SlaveConfigSynchronization</STRONG> (Thumb, 66 bytes, Stack size 16 bytes, stm32f1xx_hal_tim.o(i.HAL_TIM_SlaveConfigSynchronization))
@@ -1112,7 +1112,7 @@ Global Symbols
 <P><STRONG><a name="[b]"></a>PendSV_Handler</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, stm32f1xx_it.o(i.PendSV_Handler))
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f103xe.o(RESET)
 </UL>
-<P><STRONG><a name="[be]"></a>Rickroll</STRONG> (Thumb, 102 bytes, Stack size 8 bytes, main_1.o(i.Rickroll))
+<P><STRONG><a name="[be]"></a>Rickroll</STRONG> (Thumb, 102 bytes, Stack size 8 bytes, tone.o(i.Rickroll))
 <BR><BR>[Stack]<UL><LI>Max Depth = 160<LI>Call Chain = Rickroll &rArr; tone &rArr; user_pwm_set_frequency &rArr; MX_TIM4_Init &rArr; HAL_TIM_MspPostInit &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PWM_Stop
@@ -1324,7 +1324,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[de]"></a>mii</STRONG> (Thumb, 214 bytes, Stack size 24 bytes, main_1.o(i.mii))
+<P><STRONG><a name="[de]"></a>mii</STRONG> (Thumb, 214 bytes, Stack size 24 bytes, tone.o(i.mii))
 <BR><BR>[Stack]<UL><LI>Max Depth = 176<LI>Call Chain = mii &rArr; tone &rArr; user_pwm_set_frequency &rArr; MX_TIM4_Init &rArr; HAL_TIM_MspPostInit &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PWM_Stop
@@ -1365,10 +1365,10 @@ Global Symbols
 <P><STRONG><a name="[dc]"></a>timerEnds</STRONG> (Thumb, 94 bytes, Stack size 24 bytes, main_1.o(i.timerEnds))
 <BR><BR>[Stack]<UL><LI>Max Depth = 200<LI>Call Chain = timerEnds &rArr; mii &rArr; tone &rArr; user_pwm_set_frequency &rArr; MX_TIM4_Init &rArr; HAL_TIM_MspPostInit &rArr; HAL_GPIO_Init
 </UL>
-<BR>[Calls]<UL><LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PWM_Stop
-<LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tone
-<LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mii
+<BR>[Calls]<UL><LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mii
 <LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Rickroll
+<LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PWM_Stop
+<LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tone
 <LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
 </UL>
 <BR>[Called By]<UL><LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -1382,9 +1382,9 @@ Global Symbols
 <LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;user_pwm_set_frequency
 <LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
 </UL>
-<BR>[Called By]<UL><LI><a href="#[dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timerEnds
-<LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mii
+<BR>[Called By]<UL><LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mii
 <LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Rickroll
+<LI><a href="#[dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timerEnds
 </UL>
 
 <P><STRONG><a name="[d6]"></a>touch2Display</STRONG> (Thumb, 100 bytes, Stack size 24 bytes, interface.o(i.touch2Display))

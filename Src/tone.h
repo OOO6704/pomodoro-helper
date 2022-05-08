@@ -5,5 +5,6 @@
 
 //put tone function here
 
-
+void Rickroll(void);
+void mii(void);
 #endif

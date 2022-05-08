@@ -3,11 +3,15 @@
 #include "xpt2046.h"
 #include "image.h"
 #include "UartRingbuffer_multi.h"
+#include "main.h"
 
 static char charData[80];
 static int16_t pointX;
 static int16_t pointY;
 extern UART_HandleTypeDef huart1;
+
+extern Brain_DataTypeDef Brain_DataStruct;
+
 
 int button(uint16_t usC, uint16_t usP, int width, int height, const char *pstr, int wordCount, uint16_t color, uint16_t wordColor){
 	LCD_Clear(usC,usP,width, height,color);

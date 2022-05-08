@@ -1,5 +1,5 @@
-touchpad\tone.o: tone.c
-touchpad\tone.o: tone.h
+touchpad\tone.o: ..\Src\tone.c
+touchpad\tone.o: ..\Src\tone.h
 touchpad\tone.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
 touchpad\tone.o: ../Inc/stm32f1xx_hal_conf.h
 touchpad\tone.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h
