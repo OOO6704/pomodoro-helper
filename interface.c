@@ -3,6 +3,7 @@
 #include "xpt2046.h"
 #include "image.h"
 #include "UartRingbuffer_multi.h"
+#include "tone.h"
 
 static char charData[320];
 static uint8_t uartData[80];

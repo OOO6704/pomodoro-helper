@@ -30,6 +30,8 @@
 #include "image.h"
 #include "interface.h"
 #include <string.h>
+#include "UartRingbuffer_multi.h"
+#include "tone.h"
 
 /* USER CODE END Includes */
 
@@ -108,7 +110,7 @@ typedef struct
 
 Brain_DataTypeDef Brain_DataStruct;
 
-//button function to construct a button on a specific location
+//tone functions
 void user_pwm_set_frequency(uint16_t frequency){
 MX_TIM4_Init(frequency);
 HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
@@ -119,48 +121,6 @@ void tone(int frequency, int time){
 user_pwm_set_frequency(frequency);
 HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
 HAL_Delay(time);
-HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
-}
-
-void Rickroll(){
-HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
-HAL_Delay(100);
-tone(196,125);
-tone(220,125);
-tone(261,125);
-tone(220,125);
-tone(329,325);
-HAL_Delay(50);
-tone(329,375);
-tone(293,750);
-HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
-}
-
-void mii(){
-HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
-HAL_Delay(100);
-tone(370,375);
-HAL_Delay(125);
-tone(440,250);
-tone(554,500);
-tone(440,500);
-tone(370,250);
-tone(294,188);
-HAL_Delay(62);
-tone(294,188);
-HAL_Delay(62);	
-tone(294,188);
-HAL_Delay(1562);
-	
-tone(294,250);
-tone(370,250);
-tone(440,375);
-HAL_Delay(125);
-tone(370,250);
-HAL_Delay(500);
-tone(659,750);
-tone(622,250);
-tone(587,125);
 HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
 }
 
@@ -189,27 +149,6 @@ HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
 
 
 //testInterface function
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-  /* Prevent unused argument(s) compilation warning */
-  UNUSED(huart);
-  /* NOTE: This function Should not be modified, when the callback is needed,
-           the HAL_UART_TxCpltCallback could be implemented in the user file
-   */
- 
-	if(Uart4_Rx_Cnt >= 255)
-	{
-		Uart4_Rx_Cnt = 0;
-	}
-	else
-	{
-		rx_buffer[Uart4_Rx_Cnt++] = aRxBuffer;
-	}
-	
-	HAL_UART_Receive_IT(&huart4, (uint8_t *)&aRxBuffer, 1);
-}
-
 void updateBrainData() {
 		for(int i = 0; i<256; i++){
 			
@@ -252,6 +191,28 @@ void updateBrainData() {
 		}		
 }
 
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  /* Prevent unused argument(s) compilation warning */
+  UNUSED(huart);
+  /* NOTE: This function Should not be modified, when the callback is needed,
+           the HAL_UART_TxCpltCallback could be implemented in the user file
+   */
+ 
+	if(Uart4_Rx_Cnt >= 255)
+	{
+		Uart4_Rx_Cnt = 0;
+		
+		updateBrainData();
+	}
+	else
+	{
+		rx_buffer[Uart4_Rx_Cnt++] = aRxBuffer;
+	}
+	
+	HAL_UART_Receive_IT(&huart4, (uint8_t *)&aRxBuffer, 1);
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -270,12 +231,12 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-	
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
   SystemClock_Config();
-	
+
   /* USER CODE BEGIN SysInit */
 	
   /* USER CODE END SysInit */
@@ -285,14 +246,12 @@ int main(void)
   MX_FSMC_Init();
   MX_TIM2_Init();
   MX_TIM4_Init(256);
-	MX_UART4_Init();
+  MX_UART4_Init();
   MX_USART1_UART_Init();
-	
   /* USER CODE BEGIN 2 */
 	
 	macXPT2046_CS_DISABLE();
 	
-
 	LCD_INIT();
 	HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_1);
 
@@ -302,19 +261,6 @@ int main(void)
 
 	int pageCounter = 0;
 	int timer = 0;
-	
-		//UART DEBUG SESSION Begins
-	
-	int a = 79;
-	uint8_t uartData[10]; 
-	uartData[0] = a;
-	for(int i = 0; i<10; i++){
-	HAL_UART_Transmit(&huart1,uartData,sizeof(uartData),10);
-	HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_0);
-		HAL_Delay(1000);
-	}
-	
-		//UART DEBUG SESSION Ends
 	
 	char SignalValue[80];
 	char AttentionValue[80];
@@ -328,7 +274,10 @@ int main(void)
   Brain_DataStruct.wear_flag = 0;
   Brain_DataStruct.mode = 3;
   HAL_UART_Receive_IT(&huart4,&aRxBuffer,1);
-	
+
+	int a = 0;
+
+	Ringbuf_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -337,6 +286,12 @@ int main(void)
 	
   while (1)
   {
+		char chardata[80];
+		sprintf(chardata,"%u\n",Brain_DataStruct.LowAlpha);
+		HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_0);
+		Uart_sendstring(chardata,&huart1);
+		HAL_Delay(100);
+		
     if ( ucXPT2046_TouchFlag == 1 )	         
     {
 			Check_touchkey();			
