@@ -33,3 +33,4 @@ touchpad\interface.o: ..\Src\xpt2046.h
 touchpad\interface.o: ..\Src\image.h
 touchpad\interface.o: ..\Src\UartRingbuffer_multi.h
 touchpad\interface.o: ../Inc/main.h
+touchpad\interface.o: ..\Src\Brain_DataTypeDef.h

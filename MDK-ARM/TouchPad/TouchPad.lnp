@@ -9,6 +9,7 @@
 "touchpad\stm32f1xx_hal_msp.o"
 "touchpad\uartringbuffer_multi.o"
 "touchpad\tone.o"
+"touchpad\brain_datatypedef.o"
 "touchpad\stm32f1xx_hal_gpio_ex.o"
 "touchpad\stm32f1xx_ll_fsmc.o"
 "touchpad\stm32f1xx_hal.o"

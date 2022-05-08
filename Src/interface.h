@@ -10,7 +10,10 @@ void loading(void);
 int mainMenu(void);
 int timerScreen(void);
 void bigNumber(uint16_t usC, uint16_t usP, int num);
-int timerCount(int timer);
+int focusSelection(void);
+int breakSelection(void);
+int timerCount(int timer, int mode);
 int checkButton(int mode);
+int volumeSet(void);
 
 #endif

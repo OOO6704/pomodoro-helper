@@ -63,9 +63,9 @@ I (..\Src\lcdtp.h)(0x624C4A72)
 I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x57F606B8)
 F (..\Src\image.c)(0x625171CC)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\Src-I.\RTE\_TouchPad-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\Include-D__UVISION_VERSION="523" -D_RTE_ -DSTM32F10X_HD -DUSE_HAL_DRIVER -DSTM32F103xE-o touchpad\image.o --omf_browse touchpad\image.crf --depend touchpad\image.d)
 I (..\Src\image.h)(0x625171CE)
-F (..\Src\interface.h)(0x6277B9A3)()
-F (..\Src\interface.c)(0x6277B9A3)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\Src-I.\RTE\_TouchPad-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\Include-D__UVISION_VERSION="523" -D_RTE_ -DSTM32F10X_HD -DUSE_HAL_DRIVER -DSTM32F103xE-o touchpad\interface.o --omf_browse touchpad\interface.crf --depend touchpad\interface.d)
-I (..\Src\interface.h)(0x6277B9A3)
+F (..\Src\interface.h)(0x627805EC)()
+F (..\Src\interface.c)(0x62780E1F)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\Src-I.\RTE\_TouchPad-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\Include-D__UVISION_VERSION="523" -D_RTE_ -DSTM32F10X_HD -DUSE_HAL_DRIVER -DSTM32F103xE-o touchpad\interface.o --omf_browse touchpad\interface.crf --depend touchpad\interface.d)
+I (..\Src\interface.h)(0x627805EC)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x6210C5B0)
 I (../Inc/stm32f1xx_hal_conf.h)(0x62761208)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h)(0x6210C5B0)
@@ -98,7 +98,8 @@ I (..\Src\xpt2046.h)(0x6249CAA0)
 I (..\Src\image.h)(0x625171CE)
 I (..\Src\UartRingbuffer_multi.h)(0x62762DD8)
 I (../Inc/main.h)(0x62761208)
-F (../Src/main.c)(0x6277B9A5)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\Src-I.\RTE\_TouchPad-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\Include-D__UVISION_VERSION="523" -D_RTE_ -DSTM32F10X_HD -DUSE_HAL_DRIVER -DSTM32F103xE-o touchpad\main_1.o --omf_browse touchpad\main_1.crf --depend touchpad\main_1.d)
+I (..\Src\Brain_DataTypeDef.h)(0x6277EFD7)
+F (../Src/main.c)(0x62780A4F)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\Src-I.\RTE\_TouchPad-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\Include-D__UVISION_VERSION="523" -D_RTE_ -DSTM32F10X_HD -DUSE_HAL_DRIVER -DSTM32F103xE-o touchpad\main_1.o --omf_browse touchpad\main_1.crf --depend touchpad\main_1.d)
 I (../Inc/main.h)(0x62761208)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x6210C5B0)
 I (../Inc/stm32f1xx_hal_conf.h)(0x62761208)
@@ -131,10 +132,11 @@ I (../Src/lcdtp.h)(0x624C4A72)
 I (../Src/xpt2046.h)(0x6249CAA0)
 I (C:\Keil_v5\ARM\ARMCC\include\time.h)(0x57F606B8)
 I (../Src/image.h)(0x625171CE)
-I (../Src/interface.h)(0x6277B9A3)
+I (../Src/interface.h)(0x627805EC)
 I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x57F606B8)
 I (../Src/UartRingbuffer_multi.h)(0x62762DD8)
 I (../Src/tone.h)(0x6277B34E)
+I (../Src/Brain_DataTypeDef.h)(0x6277EFD7)
 F (../Src/stm32f1xx_it.c)(0x627631FC)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\Src-I.\RTE\_TouchPad-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\Include-D__UVISION_VERSION="523" -D_RTE_ -DSTM32F10X_HD -DUSE_HAL_DRIVER -DSTM32F103xE-o touchpad\stm32f1xx_it.o --omf_browse touchpad\stm32f1xx_it.crf --depend touchpad\stm32f1xx_it.d)
 I (../Inc/main.h)(0x62761208)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x6210C5B0)
@@ -254,6 +256,36 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x6210C5B0)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h)(0x6210C5B0)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x6210C5B0)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x6210C5B0)
+F (..\Src\Brain_DataTypeDef.c)(0x6277EF5B)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\Src-I.\RTE\_TouchPad-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\Include-D__UVISION_VERSION="523" -D_RTE_ -DSTM32F10X_HD -DUSE_HAL_DRIVER -DSTM32F103xE-o touchpad\brain_datatypedef.o --omf_browse touchpad\brain_datatypedef.crf --depend touchpad\brain_datatypedef.d)
+I (..\Src\Brain_DataTypeDef.h)(0x6277EFD7)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x6210C5B0)
+I (../Inc/stm32f1xx_hal_conf.h)(0x62761208)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h)(0x6210C5B0)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h)(0x6210C5B0)
+I (../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h)(0x6210C5AE)
+I (../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xe.h)(0x6210C5AE)
+I (../Drivers/CMSIS/Include/core_cm3.h)(0x6210C5B0)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x57F606B8)
+I (../Drivers/CMSIS/Include/core_cmInstr.h)(0x6210C5B0)
+I (../Drivers/CMSIS/Include/cmsis_armcc.h)(0x6210C5B0)
+I (../Drivers/CMSIS/Include/core_cmFunc.h)(0x6210C5B0)
+I (../Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h)(0x6210C5AE)
+I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x57F606B8)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h)(0x6210C5B0)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h)(0x6210C5B0)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h)(0x6210C5B0)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h)(0x6210C5B0)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma_ex.h)(0x6210C5B0)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h)(0x6210C5B0)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x6210C5B0)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x6210C5B0)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sram.h)(0x6210C5B0)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_fsmc.h)(0x6210C5B0)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x6210C5B0)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h)(0x6210C5B0)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x6210C5B0)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x6210C5B0)
+F (..\Src\Brain_DataTypeDef.h)(0x6277EFD7)()
 F (../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c)(0x6210C5B0)(--c99 -c --cpu Cortex-M3 -D__EVAL -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\Src-I.\RTE\_TouchPad-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\Include-D__UVISION_VERSION="523" -D_RTE_ -DSTM32F10X_HD -DUSE_HAL_DRIVER -DSTM32F103xE-o touchpad\stm32f1xx_hal_gpio_ex.o --omf_browse touchpad\stm32f1xx_hal_gpio_ex.crf --depend touchpad\stm32f1xx_hal_gpio_ex.d)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x6210C5B0)
 I (../Inc/stm32f1xx_hal_conf.h)(0x62761208)

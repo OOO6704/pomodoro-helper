@@ -4,14 +4,18 @@
 #include "image.h"
 #include "UartRingbuffer_multi.h"
 #include "main.h"
+#include "Brain_DataTypeDef.h"
 
 static char charData[80];
 static int16_t pointX;
 static int16_t pointY;
 extern UART_HandleTypeDef huart1;
-
+extern int timer;
+extern int mode;
+extern int volume;
 extern Brain_DataTypeDef Brain_DataStruct;
-
+extern void timerEnds(int mode);
+extern void updateBrainData();
 
 int button(uint16_t usC, uint16_t usP, int width, int height, const char *pstr, int wordCount, uint16_t color, uint16_t wordColor){
 	LCD_Clear(usC,usP,width, height,color);
@@ -86,9 +90,9 @@ LCD_DrawString_Color(16,8,"Welcome to Pomodoro Timer!",0xDB6E,WHITE);
 LCD_drawImage(100,100,40,40,pomodoro);
 
 button(30,220,180,20,"Timer",5,WHITE,0xDB6E);
-button(30,245,180,20,"Calibration",11,WHITE,0xDB6E);
-button(30,270,180,20,"Reports",7,WHITE,0xDB6E);
-button(30,295,180,20,"Option",6,WHITE,0xDB6E);
+button(30,245,180,20,"Debug mode",10,WHITE,0xDB6E);
+button(30,295,180,20,"Set volume",10,WHITE,0xDB6E);
+button(30,270,180,20,"Set your timer",14,WHITE,0xDB6E);
 	
 	while(1){
 	if(myCheck()){
@@ -105,11 +109,11 @@ button(30,295,180,20,"Option",6,WHITE,0xDB6E);
 		}
 		else if(pointY>=270 && pointY<=290){
 		return 3;
-			//Report
+			//Set your timer
 		}
 		else if(pointY>=295 && pointY<=315){
 		return 4;
-			//Option
+			//Set volume
 		}
 		}
 	}
@@ -212,7 +216,7 @@ int timerScreen(){
 	}
 	
 	else if(pointX >= 70 && pointX <= 170 && pointY >=250 && pointY <= 270){
-	return a*10000+b*1000+c*100+d*10+5;
+	return a*10000+b*1000+c*100+d*10+0;
 	//5 here indicates that the pageMode will go to 5, which should be the timer countdown page.
 	}
 	
@@ -305,16 +309,54 @@ void bigNumber(uint16_t usC, uint16_t usP, int num){
 	}
 }
 
+int focusSelection(){
+	LCD_Clear(0,0,240,320,0xDB6E);
+	LCD_DrawString_Color(60,144,"Focus time ends!",0xDB6E,WHITE);
+	LCD_DrawString_Color(12,164,"Time to take a short break!",0xDB6E,WHITE);
+	LCD_DrawString_Color(12,184,"Report is ready on PC side!",0xDB6E,WHITE);
+	timerEnds(0);
+	button(10,280,100,20,"Start break",11,0x4D18,WHITE);
+	button(130,280,100,20,"Back to menu",11,CYAN,WHITE);
+	while(1){
+	if (checkButton(1)==1){
+	return 6;
+	}
+	else if (checkButton(1)==2){
+	return 0;
+	}
+	}
+	return -1;
+}
 
-int timerCount(int timer){
+int breakSelection(){
+	LCD_Clear(0,0,240,320,0x4D18);
+	LCD_DrawString_Color(52,144,"Short break ends!",0x4D18,WHITE);
+	LCD_DrawString_Color(20,164,"Time to get back to work!",0x4D18,WHITE);
+	timerEnds(1);
+	button(10,280,100,20,"Start timer",11,0xDB6E,WHITE);
+	button(130,280,100,20,"Back to menu",12,CYAN,WHITE);
+	while(1){
+	if (checkButton(1)==1){
+	return 7;
+	}
+	else if (checkButton(1)==2){
+	return 0;
+	}
+	}
+	return -1;
+}
+
+int timerCount(int _timer, int _mode){
 	//Init
 	LCD_Clear(0,0,240,320,WHITE);
-	int min = timer/100;
-	int sec = timer%100;
+	int min = _timer/100;
+	int sec = _timer%100;
 	int time = 60*min+sec;
-	if(timer == 2500){
+	if(_mode == 0){
+		//focus mode!
 	LCD_DrawString(36,8,"Now its time to work!");}
-	else if(timer == 500){
+	else if(_mode == 1){
+		//rest mode!
 	LCD_DrawString(24,8,"Let's take a good break!");
 	}
 	LCD_DrawString(52,49,"Min:");
@@ -348,7 +390,10 @@ int timerCount(int timer){
 		
 		for(int i=0; i<10; i++){
 		if(i == 1){
-		Uart_sendstring("Hello",&huart1);
+		if(mode == 0){
+		updateBrainData();
+		sprintf(charData,"%u %u %u %u %u %u %u\n",Brain_DataStruct.LowAlpha,Brain_DataStruct.HighAlpha,Brain_DataStruct.LowBeta,Brain_DataStruct.HighBeta,Brain_DataStruct.attention,Brain_DataStruct.relax,Brain_DataStruct.signal);
+    Uart_sendstring(charData,&huart1);}
 		
 		
 		}
@@ -371,32 +416,67 @@ int timerCount(int timer){
 		HAL_Delay(100);
 		}
 	}
-	if(timer == 2500){
-	LCD_Clear(0,0,240,320,0xDB6E);
-	LCD_DrawString_Color(60,144,"Focus time ends!",0xDB6E,WHITE);
-	LCD_DrawString_Color(12,164,"Time to take a short break!",0xDB6E,WHITE);
-	//Timer ends!
-	return 6;}
-	else if(timer == 500){
-	LCD_Clear(0,0,240,320,0x4D18);
-	LCD_DrawString_Color(52,144,"Short break ends!",0x4D18,WHITE);
-	LCD_DrawString_Color(20,164,"Time to get back to work!",0x4D18,WHITE);
-	return 7;
+	if(_mode == 0){
+		//Focus mode!
+	mode = 1;
+		//Timer ends!
+	return focusSelection();}
+	else if(_mode == 1){
+		//restmode!
+	
+	mode = 0;
+	return breakSelection();
+	}
+return -1;
+}
+
+int volumeSet(){
+	int temp = volume;
+	int level;
+LCD_Clear(0,0,240,320,BLACK);
+LCD_DrawString_Color(24,100,"Slide to set Volume here",BLACK,WHITE);
+	
+	button(10,280,100,20,"OK!",3,WHITE,BLACK);
+	button(130,280,100,20,"Cancel",6,WHITE,BLACK);
+	LCD_Clear(15,160,210,30,WHITE);
+	while(1){
+	level = checkButton(2);
+	if(level==1){return 0;}
+	
+	else if(level==2){
+	volume = temp;
+	return 0;
+	}
+	else if(level!=0){
+	level = level-20;
+	for(int i = 0; i<level/2; i++){
+	LCD_Clear(20+2*i,165,2,20,BLUE);
+	
+	}
+	for(int j = 0; j<(100-level/2); j++){
+	LCD_Clear(218-2*j,165,2,20,WHITE);
+	}
+	LCD_DrawString_Color(84,134,"Volume:   ",BLACK,WHITE);
+	volume = level/2;
+	sprintf(charData,"%d",volume);
+	LCD_DrawString_Color(140,134,charData,BLACK,WHITE);
+  }
+	
 	}
 }
 
 //Check button from different cases
-int checkButton(int mode){
+int checkButton(int _mode){
 	//timerCountDown Screen
 	
 	if(myCheck()){
 		XPT2046_ReadAdc_XY(&pointX, &pointY);
 		touch2Display(&pointX, &pointY);
 	}
-	else {return 0;}
+	else{return 0;}
 	
 	//TimerCountdown Screen
-	if(mode == 1){
+	if(_mode == 1){
 	if(pointY>=280 && pointY<=300){
 	if(pointX>=10 && pointX<=110){
 		// pause
@@ -409,6 +489,25 @@ int checkButton(int mode){
 	}
 	}
 	
+	else if(_mode ==2){
+	if(pointY>=280 && pointY<=300){
+	if(pointX>=10 && pointX<=110){
+		// pause
+		return 1;
+	}
+	else if(pointX>=130 && pointX<=230){
+		// Stop
+		return 2;
+	}
+	}
+	else if(pointY>=165 && pointY<=190){
+	if(pointX>220){pointX = 220;}
+	else if(pointX<20){pointX = 20;}
+	return pointX;
+	//between 20 - 220
+	}
+	//Plus and minus here!
+	}
 	
+	return 0;
 }
-

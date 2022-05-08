@@ -22,22 +22,7 @@
 #include "main.h"
 
 //special type
-typedef struct
-{
-    uint8_t Brain_Data[36];
-    uint8_t signal;
-    uint8_t attention;
-    uint8_t relax;
-    volatile uint8_t receive_flag;
-    volatile uint8_t wear_flag;
-    volatile uint8_t off_flag;
-    volatile uint8_t mode;
-    volatile uint32_t LowAlpha;
-    volatile uint32_t HighAlpha;
-    volatile uint32_t LowBeta;
-    volatile uint32_t HighBeta;
 
-}Brain_DataTypeDef;
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -49,6 +34,7 @@ typedef struct
 #include <string.h>
 #include "UartRingbuffer_multi.h"
 #include "tone.h"
+#include "Brain_DataTypeDef.h"
 
 /* USER CODE END Includes */
 
@@ -63,6 +49,9 @@ typedef struct
 char charData[80];
 int16_t pointX;
 int16_t pointY;
+int timer = 2500;
+int mode = 0;
+int volume = 100;
 
 //uart variable
 char charValue[80];	
@@ -107,10 +96,6 @@ static void MX_USART1_UART_Init(void);
 
 #define SYNC 0xAA
 #define EXCODE 0x55
-
-
-
-Brain_DataTypeDef Brain_DataStruct;
 
 //button function to construct a button on a specific location
 void user_pwm_set_frequency(uint16_t frequency){
@@ -319,10 +304,8 @@ int main(void)
 			
 			case 1: 
 				loading();
-				//timer = timerScreen();
-				//pageCounter = timer%10;
-				//timer = timer/10;
-				pageCounter = timerCount(2500);
+				mode = 0;
+				pageCounter = timerCount(timer,mode);
 				break;
 			
 			case 2:
@@ -434,6 +417,7 @@ int main(void)
 							
 							break;
 						}
+						
 						else {
 							continue;
 						}
@@ -441,7 +425,10 @@ int main(void)
 						
 						
 					}
-					
+					if(checkButton(1)){
+						pageCounter = 0;
+						break;
+						}
 					//HAL_Delay(2000);
 					
     /* USER CODE END WHILE */
@@ -450,20 +437,33 @@ int main(void)
 				}
 				break;
 			
+			case 3:
+				//Set timer
+				timer = timerScreen();
+				pageCounter = timer%10;
+				timer = timer/10;
+				break;
+			
+			case 4:
+				pageCounter = volumeSet();
+				break;
+			
 			case 5:
-				pageCounter = timerCount(2500);
+				//pageCounter = timerCount(2500);
 				break;
 			
 			case 6:
 			//Pomodoro timer ends.
-				timerEnds(0);
-				pageCounter = timerCount(500);
+				//Start break or return?
+				mode = 1;
+				pageCounter = timerCount(500,mode);
 				break;
 			
 			case 7:
 				//short break timer ends.
-				timerEnds(1);
-				pageCounter = timerCount(2500);
+				//Start timer or return?
+				mode = 0;
+				pageCounter = timerCount(timer,mode);
 				break;
 			
 			default:
@@ -621,7 +621,7 @@ static void MX_TIM4_Init(uint16_t frequency)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 30000/frequency;
+  sConfigOC.Pulse = 300*volume/frequency;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
