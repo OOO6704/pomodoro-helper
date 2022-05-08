@@ -483,11 +483,6 @@
               <FilePath>..\Src\interface.c</FilePath>
             </File>
             <File>
-              <FileName>tone.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\tone.c</FilePath>
-            </File>
-            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/main.c</FilePath>
@@ -561,6 +556,21 @@
               <FileName>UartRingbuffer_multi.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\UartRingbuffer_multi.c</FilePath>
+            </File>
+            <File>
+              <FileName>tone.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\tone.c</FilePath>
+            </File>
+            <File>
+              <FileName>Brain_DataTypeDef.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\Brain_DataTypeDef.c</FilePath>
+            </File>
+            <File>
+              <FileName>Brain_DataTypeDef.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Src\Brain_DataTypeDef.h</FilePath>
             </File>
           </Files>
         </Group>

@@ -15,5 +15,6 @@ int breakSelection(void);
 int timerCount(int timer, int mode);
 int checkButton(int mode);
 int volumeSet(void);
+int reminder(int time);
 
 #endif

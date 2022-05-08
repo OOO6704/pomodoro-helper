@@ -5,6 +5,7 @@
 #include "UartRingbuffer_multi.h"
 #include "main.h"
 #include "Brain_DataTypeDef.h"
+#include "tone.h"
 
 static char charData[80];
 static int16_t pointX;
@@ -349,9 +350,12 @@ int breakSelection(){
 int timerCount(int _timer, int _mode){
 	//Init
 	LCD_Clear(0,0,240,320,WHITE);
+	HAL_GPIO_WritePin(GPIOB,GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_5,GPIO_PIN_SET);
+	int wearIndicator = 0;
 	int min = _timer/100;
 	int sec = _timer%100;
 	int time = 60*min+sec;
+	int focusCounter = 0;
 	if(_mode == 0){
 		//focus mode!
 	LCD_DrawString(36,8,"Now its time to work!");}
@@ -392,11 +396,36 @@ int timerCount(int _timer, int _mode){
 		if(i == 1){
 		if(mode == 0){
 		updateBrainData();
-		sprintf(charData,"%u %u %u %u %u %u %u\n",Brain_DataStruct.LowAlpha,Brain_DataStruct.HighAlpha,Brain_DataStruct.LowBeta,Brain_DataStruct.HighBeta,Brain_DataStruct.attention,Brain_DataStruct.relax,Brain_DataStruct.signal);
-    Uart_sendstring(charData,&huart1);}
-		
-		
+		if(/*Brain_DataStruct.LowAlpha!=0 &&*/ Brain_DataStruct.signal==0){
+		HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOB,GPIO_PIN_0,GPIO_PIN_RESET);
+		LCD_Clear(0,180,240,32,WHITE);
 		}
+		//Not wearing good
+		else if(Brain_DataStruct.signal==200){
+		LCD_DrawString(0,180,"Please check if the sensor is well equipped.");
+		HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_5);}
+		sprintf(charData,"%u %u %u %u %u %u %u\n",Brain_DataStruct.LowAlpha,Brain_DataStruct.HighAlpha,Brain_DataStruct.LowBeta,Brain_DataStruct.HighBeta,Brain_DataStruct.attention,Brain_DataStruct.relax,Brain_DataStruct.signal);
+    Uart_sendstring(charData,&huart1);
+		if(Brain_DataStruct.attention<25){
+		focusCounter++;
+		}
+		else if(Brain_DataStruct.attention>=25){
+		focusCounter = 0;
+		}
+		if(focusCounter>30){
+		//Reminder mode
+			int point = reminder(time);
+			if(point==2){
+			return 0;
+			}
+			else if (point == 1){
+				focusCounter = 0;
+			continue;
+			}
+		}
+		}
+	}
 		if(checkButton(1)==1){
 		button(10,280,100,20,"Continue",8,CYAN,BLACK);
 		button(130,280,100,20,"Stop!",5,GREY,WHITE);
@@ -413,7 +442,8 @@ int timerCount(int _timer, int _mode){
 		else if(checkButton(1)==2){
 		time = 0;
 		}
-		HAL_Delay(100);
+	
+		HAL_Delay(83);
 		}
 	}
 	if(_mode == 0){
@@ -510,4 +540,27 @@ int checkButton(int _mode){
 	}
 	
 	return 0;
+}
+
+int reminder(int time){
+LCD_Clear(0,0,240,320,0xDB6E);
+	LCD_DrawString_Color(0,180,"It seems that there is a bit..Distraction",0xDB6E,WHITE);
+	LCD_DrawString_Color(16,220,"Keep it up! You can do it!",0xDB6E,WHITE);
+	button(10,280,100,20,"Continue!",9,GREEN,WHITE);
+	button(130,280,100,20,"Stop...",7,GREY,BLACK);
+	while(1){
+	if(checkButton(1)==1){
+		LCD_Clear(0,0,240,320,WHITE);
+		LCD_DrawString(36,8,"Now its time to work!");
+		LCD_DrawString(52,49,"Min:");
+		LCD_DrawString(178,49,"Sec:");
+		bigNumber(5,70,time/60/10);
+		bigNumber(60,70,time/60%10);
+		bigNumber(130,70,time%60/10);
+		bigNumber(185,70,time%60%10);
+		button(10,280,100,20,"Pause",5,CYAN,BLACK);
+	button(130,280,100,20,"Stop!",5,RED,WHITE);
+	return 1;
+	}
+	else if(checkButton(1)==2){return 2;}}
 }
