@@ -43,8 +43,7 @@ void Ringbuf_init(void)
   _tx_buffer1 = &tx_buffer1;
   _rx_buffer2 = &rx_buffer2;
   _tx_buffer2 = &tx_buffer2;
-	
-	
+
   /* Enable the UART Error Interrupt: (Frame error, noise error, overrun error) */
   __HAL_UART_ENABLE_IT(pc_uart, UART_IT_ERR);
 
@@ -159,10 +158,8 @@ void Uart_write(int c, UART_HandleTypeDef *uart)
 
 			_tx_buffer2->buffer[_tx_buffer2->head] = (uint8_t)c;
 			_tx_buffer2->head = i;
-			HAL_Delay(500);
-			HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_0);
+
 			__HAL_UART_ENABLE_IT(pc_uart, UART_IT_TXE); // Enable UART transmission interrupt
-			
 			}
 	}
 }
@@ -189,7 +186,6 @@ int Get_after (char *string, uint8_t numberofchars, char *buffertosave, UART_Han
 
 void Uart_sendstring (const char *s, UART_HandleTypeDef *uart)
 {
-	HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_1);
 	while(*s!='\0') Uart_write(*s++, uart);
 }
 
