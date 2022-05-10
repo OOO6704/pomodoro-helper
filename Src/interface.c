@@ -431,7 +431,7 @@ int timerCount(int _timer, int _mode){
 		focusPeriod++;
 		}
 		if(focusPeriod>30){
-		if(focusCounter<(45*30)){
+		if(focusCounter<(45*30||focusCounter>80*30)){
 		//Reminder mode
 			int point = reminder(time);
 			if(point==2){
@@ -442,6 +442,10 @@ int timerCount(int _timer, int _mode){
 				focusPeriod = 0;
 			continue;
 			}
+		}
+		else {
+			focusPeriod = 0;
+			focusCounter = 0;
 		}
 	}
 		}
