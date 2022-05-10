@@ -356,6 +356,7 @@ int timerCount(int _timer, int _mode){
 	int sec = _timer%100;
 	int time = 60*min+sec;
 	int focusCounter = 0;
+	int focusPeriod = 0;
 	if(_mode == 0){
 		//focus mode!
 	LCD_DrawString(36,8,"Now its time to work!");
@@ -409,19 +410,28 @@ int timerCount(int _timer, int _mode){
 		LCD_Clear(0,180,240,32,WHITE);
 		}
 		//Not wearing good
-		else if(Brain_DataStruct.signal==200 || Brain_DataStruct.signal==51 || Brain_DataStruct.signal==26 || Brain_DataStruct.signal==80){
+		else if(Brain_DataStruct.signal==26){
+		LCD_Clear(0,180,240,64,WHITE);
+		LCD_DrawString(0,180,"Signal is not very good, adjusting.");
+		HAL_GPIO_WritePin(GPIOB,GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_5,GPIO_PIN_SET);	
+		HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_0|GPIO_PIN_5);}
+		else if(Brain_DataStruct.signal==200 || Brain_DataStruct.signal==51 || Brain_DataStruct.signal==80){
 		LCD_Clear(0,180,240,64,WHITE);
 		LCD_DrawString(0,180,"Please check if the sensor is well equipped.");
+		HAL_GPIO_WritePin(GPIOB,GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_5,GPIO_PIN_SET);
 		HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_5);}
 		sprintf(charData,"%u %u %u %u %u %u %u\n",Brain_DataStruct.LowAlpha,Brain_DataStruct.HighAlpha,Brain_DataStruct.LowBeta,Brain_DataStruct.HighBeta,Brain_DataStruct.attention,Brain_DataStruct.relax,Brain_DataStruct.signal);
     Uart_sendstring(charData,&huart1);
-		if(Brain_DataStruct.attention<60){
-		focusCounter++;
+		if(Brain_DataStruct.attention<40 && focusPeriod == 0){
+		focusCounter+=Brain_DataStruct.attention;
+		focusPeriod++;
 		}
-		else if(Brain_DataStruct.attention>=60){
-		focusCounter = 0;
+		else if(focusPeriod > 0){
+		focusCounter+=Brain_DataStruct.attention;
+		focusPeriod++;
 		}
-		if(focusCounter>30){
+		if(focusPeriod>30){
+		if(focusCounter<(45*30)){
 		//Reminder mode
 			int point = reminder(time);
 			if(point==2){
@@ -429,9 +439,11 @@ int timerCount(int _timer, int _mode){
 			}
 			else if (point == 1){
 				focusCounter = 0;
+				focusPeriod = 0;
 			continue;
 			}
 		}
+	}
 		}
 	}
 		if(checkButton(1)==1){
