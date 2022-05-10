@@ -358,7 +358,13 @@ int timerCount(int _timer, int _mode){
 	int focusCounter = 0;
 	if(_mode == 0){
 		//focus mode!
-	LCD_DrawString(36,8,"Now its time to work!");}
+	LCD_DrawString(36,8,"Now its time to work!");
+	LCD_DrawString_Color(0,180,"Green",GREY,GREEN);
+	LCD_DrawString(48,180,"light means good signal");
+	LCD_DrawString_Color(0,200,"Red",GREY,RED);
+	LCD_DrawString(48,200,"light means bad signal");
+	LCD_DrawString(0,220, "no light means module is not detected.");
+	}
 	else if(_mode == 1){
 		//rest mode!
 	LCD_DrawString(24,8,"Let's take a good break!");
@@ -396,21 +402,23 @@ int timerCount(int _timer, int _mode){
 		if(i == 1){
 		if(mode == 0){
 		updateBrainData();
-		if(/*Brain_DataStruct.LowAlpha!=0 &&*/ Brain_DataStruct.signal==0){
+		if(Brain_DataStruct.LowAlpha!=0 && Brain_DataStruct.signal==0){
+		LCD_Clear(0,180,240,64,WHITE);
 		HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,GPIO_PIN_SET);
 		HAL_GPIO_WritePin(GPIOB,GPIO_PIN_0,GPIO_PIN_RESET);
 		LCD_Clear(0,180,240,32,WHITE);
 		}
 		//Not wearing good
-		else if(Brain_DataStruct.signal==200){
+		else if(Brain_DataStruct.signal==200 || Brain_DataStruct.signal==51 || Brain_DataStruct.signal==26 || Brain_DataStruct.signal==80){
+		LCD_Clear(0,180,240,64,WHITE);
 		LCD_DrawString(0,180,"Please check if the sensor is well equipped.");
 		HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_5);}
 		sprintf(charData,"%u %u %u %u %u %u %u\n",Brain_DataStruct.LowAlpha,Brain_DataStruct.HighAlpha,Brain_DataStruct.LowBeta,Brain_DataStruct.HighBeta,Brain_DataStruct.attention,Brain_DataStruct.relax,Brain_DataStruct.signal);
     Uart_sendstring(charData,&huart1);
-		if(Brain_DataStruct.attention<25){
+		if(Brain_DataStruct.attention<60){
 		focusCounter++;
 		}
-		else if(Brain_DataStruct.attention>=25){
+		else if(Brain_DataStruct.attention>=60){
 		focusCounter = 0;
 		}
 		if(focusCounter>30){
@@ -546,6 +554,7 @@ int reminder(int time){
 LCD_Clear(0,0,240,320,0xDB6E);
 	LCD_DrawString_Color(0,180,"It seems that there is a bit..Distraction",0xDB6E,WHITE);
 	LCD_DrawString_Color(16,220,"Keep it up! You can do it!",0xDB6E,WHITE);
+	famMart();
 	button(10,280,100,20,"Continue!",9,GREEN,WHITE);
 	button(130,280,100,20,"Stop...",7,GREY,BLACK);
 	while(1){
@@ -554,6 +563,11 @@ LCD_Clear(0,0,240,320,0xDB6E);
 		LCD_DrawString(36,8,"Now its time to work!");
 		LCD_DrawString(52,49,"Min:");
 		LCD_DrawString(178,49,"Sec:");
+		LCD_DrawString_Color(0,180,"Green",GREY,GREEN);
+	LCD_DrawString(48,180,"light means good signal");
+	LCD_DrawString_Color(0,200,"Red",GREY,RED);
+	LCD_DrawString(48,200,"light means bad signal");
+	LCD_DrawString(0,220, "no light means module is not  detected.");
 		bigNumber(5,70,time/60/10);
 		bigNumber(60,70,time/60%10);
 		bigNumber(130,70,time%60/10);

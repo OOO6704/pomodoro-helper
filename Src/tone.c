@@ -3,6 +3,21 @@
 extern TIM_HandleTypeDef htim4;
 extern void tone(int frequency, int time);
 
+void famMart(){
+	HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
+tone(830,250);
+tone(660,250);
+tone(494,250);
+tone(660,250);
+tone(740,250);
+tone(988,750);
+tone(740,250);
+tone(830,250);
+tone(740,250);
+tone(494,250);
+tone(660,750);
+	HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
+}
 
 void Rickroll(){
 HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);

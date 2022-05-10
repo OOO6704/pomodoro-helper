@@ -7,4 +7,5 @@
 
 void Rickroll(void);
 void mii(void);
+void famMart(void);
 #endif
